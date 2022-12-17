@@ -43,7 +43,6 @@ exports.uploadProfielImage = async (req, res, next) => {
 
     const { name } = req.body;
 
-    console.log(req.body);
     const findUser = await findUserById(user_id);
     if (!findUser) throw createHttpError.NotFound();
 
@@ -67,6 +66,12 @@ exports.uploadProfielImage = async (req, res, next) => {
         folder: "profile",
       });
 
+      if (!result) {
+        fs.unlink(path, (err) => {
+          if (err) throw createHttpError.InternalServerError();
+        });
+      }
+
       const saveProfile = await savedPorfilePic({
         user_id: findUser.dataValues.id,
         image_url: result.secure_url,
@@ -76,9 +81,11 @@ exports.uploadProfielImage = async (req, res, next) => {
       await changeProfilePicById(user_id, saveProfile.image_url);
       const changed = await changeNameById(user_id, name);
 
-      fs.unlink(path, (err) => {
-        if (err) throw createHttpError.InternalServerError();
-      });
+      if (saveProfile) {
+        fs.unlink(path, (err) => {
+          if (err) throw createHttpError.InternalServerError();
+        });
+      }
 
       res.status(200).json({
         message: "image upload and profile edit succesfull",
@@ -94,6 +101,12 @@ exports.uploadProfielImage = async (req, res, next) => {
       info: changed,
     });
   } catch (error) {
+    if (req.files && req.files.length > 0) {
+      const { path } = req.files[0];
+      fs.unlink(path, (err) => {
+        if (err) throw createHttpError.InternalServerError();
+      });
+    }
     next(error);
   }
 };
@@ -105,20 +118,33 @@ exports.uploadImage = async (req, res, next) => {
       folder: "post",
     });
 
+    if (!result) {
+      fs.unlink(path, (err) => {
+        if (err) throw createHttpError.InternalServerError();
+      });
+    }
     const saveImg = await savedImage({
       image_url: result.secure_url,
       cloudinary_id: result.public_id,
     });
 
-    fs.unlink(path, (err) => {
-      if (err) throw createHttpError.InternalServerError();
-    });
+    if (saveImg) {
+      fs.unlink(path, (err) => {
+        if (err) throw createHttpError.InternalServerError();
+      });
+    }
 
     res.status(200).json({
       message: "image upload succesfull",
       info: saveImg,
     });
   } catch (error) {
+    if (req.files && req.files.length > 0) {
+      const { path } = req.files[0];
+      fs.unlink(path, (err) => {
+        if (err) throw createHttpError.InternalServerError();
+      });
+    }
     next(error);
   }
 };
