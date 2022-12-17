@@ -1,0 +1,4 @@
+{
+  // "extends": ["next/core-web-vitals", "next/bable"]
+  "extends": "next/core-web-vitals"
+}

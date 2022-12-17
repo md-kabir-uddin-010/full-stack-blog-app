@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200;300;400;600;700;800;900&display=swap");
+
+body {
+  font-family: "Nunito Sans", sans-serif;
+}
+/* 
+*::-webkit-scrollbar {
+  display: none;
+}
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+} */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(224px, 1fr));
+  justify-items: center;
+  gap: 20px;
+}
+@media (max-width: 320px) {
+  .gallery {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
